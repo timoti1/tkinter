@@ -26,7 +26,7 @@ def init_gui():
     холст.pack(fill = tkinter.BOTH, expand = True)
 
 
-def draw_board():
+def draw_board(whitecolor = None, blackcolor = None):
     сторона_квадрата = размер_доски // 8
 
     номер_квадратика = 0
@@ -36,9 +36,9 @@ def draw_board():
         for ix in range(8):
             номер_квадратика += 1
             if номер_квадратика % 2 == 1:
-                цвет_клетки = "black"
+                цвет_клетки = blackcolor
             else:
-                цвет_клетки = None
+                цвет_клетки = whitecolor
 
             холст.create_rectangle(ix*сторона_квадрата+5, iy*сторона_квадрата+5,
                                    (ix+1)*сторона_квадрата+5, (iy+1)*сторона_квадрата+5,
@@ -65,7 +65,7 @@ def highlight_cell(ix, iy, color):
         pass
 
 
-def draw_arrow(ix_from, iy_from, ix_to, iy_to, color):
+def draw_arrow(ix_from, iy_from, ix_to, iy_to, color="black", width=1):
     tag_from = "rect{}{}".format(iy_from, ix_from)
     tag_to = "rect{}{}".format(iy_to, ix_to)
 
@@ -80,8 +80,8 @@ def draw_arrow(ix_from, iy_from, ix_to, iy_to, color):
         to_x = rect_to[0] + сторона_квадрата // 2
         to_y = rect_to[1] + сторона_квадрата // 2
 
-        print(from_x, from_y, to_x, to_y)
-        холст.create_line(from_x, from_y, to_x, to_y, fill = color, arrow = tkinter.LAST)
+        # print(from_x, from_y, to_x, to_y)
+        холст.create_line(from_x, from_y, to_x, to_y, fill = color, arrow = tkinter.LAST, width=width)
 
         холст.update_idletasks()
         холст.update()
@@ -89,9 +89,10 @@ def draw_arrow(ix_from, iy_from, ix_to, iy_to, color):
         pass
 
 
-init_gui()
-draw_board()
+if __name__ == '__main__':
+    init_gui()
+    draw_board()
 
 
-# tkinter.mainloop()
+    окно.mainloop()
 
