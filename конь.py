@@ -2,7 +2,7 @@ import gui
 import time
 import random
 
-
+gui.размер_доски = 800
 if __name__ == '__main__':
     # рисуем доску
     gui.init_gui()
