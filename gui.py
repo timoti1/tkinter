@@ -53,9 +53,37 @@ def draw_board(whitecolor = None, blackcolor = None):
         холст.create_text(размер_доски + 10, размер_доски - сторона_квадрата*(iy + 0.5), text = iy+1)
 
 
-def highlight_cell(ix, iy, color):
-    tag = "rect{}{}".format(iy, ix)
+def highlight_cell(ix, iy, color, kind = 'dot'):
+    tag = None
+    rect_tag = 'rect{}{}'.format(iy, ix)
 
+    #пользователь захотел подсветить всю клетку
+    if kind == 'rect':
+        tag = rect_tag
+
+    # пользователь захотел подсветить кружок в центре клетки
+    if kind == 'dot':
+        dot_tag = 'dot{}{}'.format(iy, ix)
+
+        try:
+            rect = холст.coords(rect_tag)
+
+            tag = холст.find_withtag(dot_tag)
+            print('tag = {}'.format(tag))
+
+            if tag == ():
+                сторона_квадрата = размер_доски // 8
+
+                rect_center_x = rect[0] + сторона_квадрата // 2
+                rect_center_y = rect[1] + сторона_квадрата // 2
+
+                холст.create_oval(rect_center_x - 5, rect_center_y - 5, rect_center_x + 5, rect_center_y + 5, tags = dot_tag)
+
+            tag = dot_tag
+        except:
+            pass
+
+    #меняем цвет подсвечиваемого элемента (того, на который указывает tag)
     try:
         холст.itemconfig(tag, fill = color)
 
@@ -66,8 +94,8 @@ def highlight_cell(ix, iy, color):
 
 
 def draw_arrow(ix_from, iy_from, ix_to, iy_to, color="black", width=1):
-    tag_from = "rect{}{}".format(iy_from, ix_from)
-    tag_to = "rect{}{}".format(iy_to, ix_to)
+    tag_from = 'rect{}{}'.format(iy_from, ix_from)
+    tag_to = 'rect{}{}'.format(iy_to, ix_to)
 
     сторона_квадрата = размер_доски // 8
 
