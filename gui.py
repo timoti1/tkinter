@@ -1,29 +1,61 @@
 import tkinter
 
-размер_доски = 400
-
 окно = None
 холст = None
+поле_величина_задержки = None
+кнопка_расчитать = None
 
-def init_gui():
-    global окно, холст
+размер_доски = 400
+ширина_информационной_панели = 150
+
+цвет_фона_доски = '#F5F5E5'
+цвет_фона_информационной_панели = None
+
+
+def init_gui(info_panel = False):
+    global окно, холст, поле_величина_задержки, кнопка_расчитать, ширина_информационной_панели
+
+    if not info_panel:
+        ширина_информационной_панели = 0
+
+    w = h = размер_доски
 
     окно = tkinter.Tk()
-    # окно.config(width = 600, height = 600, background = "brown")
     окно.title("Chess")
-
-    # l = окно.winfo_rootx()
-    # t = окно.winfo_rooty()
 
     mw = окно.winfo_screenwidth()
     mh = окно.winfo_screenheight()
-    w = h = размер_доски
 
-    окно.geometry("{}x{}+{}+{}".format(w + 20, h + 20, (mw - w) // 2, (mh - h) // 2))
+    окно.geometry("{}x{}+{}+{}".format(w + ширина_информационной_панели + 20, h + 20, (mw - w) // 2, (mh - h) // 2))
     окно.resizable(0, 0)
 
-    холст = tkinter.Canvas(background = "lightyellow")
-    холст.pack(fill = tkinter.BOTH, expand = True)
+    контейнер1 = tkinter.Frame(master = окно)
+    контейнер1.place(x = 0, y = 0, width = w + 20, height = h + 20)
+
+    холст = tkinter.Canvas(master = контейнер1, background = цвет_фона_доски)
+    холст.pack(fill = tkinter.BOTH, expand=True)
+
+    if info_panel:
+        контейнер2 = tkinter.Frame(master = окно, background = цвет_фона_информационной_панели)
+        контейнер2.place(x = w + 20, y = 0, width = ширина_информационной_панели - 20, height = h + 20)
+
+        метка_величина_задержки = tkinter.Label(master = контейнер2, text = 'Задержка, с:', background = цвет_фона_информационной_панели)
+        метка_величина_задержки.place(x = 20, y = 0)
+
+        поле_величина_задержки = tkinter.Spinbox(master = контейнер2, from_ = 0, to = 1, increment = 0.1)
+        поле_величина_задержки.place(x = 20, y = 20, width = 100)
+
+        кнопка_расчитать = tkinter.Button(master = контейнер2, text = 'Рассчитать')
+        кнопка_расчитать.place(x = 20, y = 50, width = 100)
+
+
+def get_delay():
+    try:
+        задержка = поле_величина_задержки.get()
+    except:
+        задержка = 0
+
+    return float(задержка)
 
 
 def draw_board(whitecolor = None, blackcolor = None):
@@ -50,7 +82,7 @@ def draw_board(whitecolor = None, blackcolor = None):
         холст.create_text(сторона_квадрата*(ix + 0.5), размер_доски + 10, text = буквы[ix])
 
     for iy in range(8):
-        холст.create_text(размер_доски + 10, размер_доски - сторона_квадрата*(iy + 0.5), text = iy+1)
+        холст.create_text(размер_доски + 12, размер_доски - сторона_квадрата*(iy + 0.5), text = iy+1)
 
 
 def highlight_cell(ix, iy, color, kind = 'dot'):
@@ -63,13 +95,12 @@ def highlight_cell(ix, iy, color, kind = 'dot'):
 
     # пользователь захотел подсветить кружок в центре клетки
     if kind == 'dot':
-        dot_tag = 'dot{}{}'.format(iy, ix)
+        dot_tag = 'dot {}{}'.format(iy, ix)
 
         try:
             rect = холст.coords(rect_tag)
 
             tag = холст.find_withtag(dot_tag)
-            print('tag = {}'.format(tag))
 
             if tag == ():
                 сторона_квадрата = размер_доски // 8
@@ -93,7 +124,7 @@ def highlight_cell(ix, iy, color, kind = 'dot'):
         pass
 
 
-def draw_arrow(ix_from, iy_from, ix_to, iy_to, color="black", width=1):
+def draw_arrow(ix_from, iy_from, ix_to, iy_to, color = "black", width = 1):
     tag_from = 'rect{}{}'.format(iy_from, ix_from)
     tag_to = 'rect{}{}'.format(iy_to, ix_to)
 
@@ -109,7 +140,7 @@ def draw_arrow(ix_from, iy_from, ix_to, iy_to, color="black", width=1):
         to_y = rect_to[1] + сторона_квадрата // 2
 
         # print(from_x, from_y, to_x, to_y)
-        холст.create_line(from_x, from_y, to_x, to_y, fill = color, arrow = tkinter.LAST, width=width)
+        холст.create_line(from_x, from_y, to_x, to_y, fill = color, arrow = tkinter.LAST, width = width, tags = 'line')
 
         холст.update_idletasks()
         холст.update()
@@ -117,10 +148,17 @@ def draw_arrow(ix_from, iy_from, ix_to, iy_to, color="black", width=1):
         pass
 
 
+def clear_board():
+    try:
+        холст.delete('line')
+        холст.delete('dot')
+    except:
+        pass
+
 if __name__ == '__main__':
-    init_gui()
+    init_gui(True)
     draw_board()
 
-
     окно.mainloop()
+
 
