@@ -1,19 +1,27 @@
 import tkinter
 
+#глобальные переменные - виджеты
 окно = None
 холст = None
 поле_величина_задержки = None
 кнопка_расчитать = None
 
+#другие глобальные переменные
 размер_доски = 400
 ширина_информационной_панели = 150
 
 цвет_фона_доски = '#F5F5E5'
 цвет_фона_информационной_панели = None
 
+цвет_белой_клетки = None
+цвет_черной_клетки = None
+
+выбранная_фигура = None
+
 
 def init_gui(info_panel = False):
-    global окно, холст, поле_величина_задержки, кнопка_расчитать, ширина_информационной_панели
+    global окно, холст, поле_величина_задержки, кнопка_расчитать,\
+           ширина_информационной_панели, выбранная_фигура
 
     if not info_panel:
         ширина_информационной_панели = 0
@@ -46,7 +54,24 @@ def init_gui(info_panel = False):
         поле_величина_задержки.place(x = 20, y = 20, width = 100)
 
         кнопка_расчитать = tkinter.Button(master = контейнер2, text = 'Рассчитать')
-        кнопка_расчитать.place(x = 20, y = 50, width = 100)
+        кнопка_расчитать.place(x = 20, y = 45, width = 100)
+
+        метка_выбранная_фигура = tkinter.Label(master = контейнер2, text = 'Фигура:', background = цвет_фона_информационной_панели)
+        метка_выбранная_фигура.place(x = 20, y = 80)
+
+        ФИГУРЫ = [
+                'конь',
+                'ладья',
+                'король',
+                'ферзь'
+        ]
+
+        выбранная_фигура = tkinter.StringVar()
+        выбранная_фигура.set('король')
+
+        for i, фигура in enumerate(ФИГУРЫ):
+            b = tkinter.Radiobutton(master = контейнер2, text = фигура, variable = выбранная_фигура, value = фигура, indicatoron = 0)
+            b.place(x = 20, y = 100 + i*20, width = 100)
 
 
 def get_delay():
@@ -58,7 +83,17 @@ def get_delay():
     return float(задержка)
 
 
+def get_selected_figure():
+    return выбранная_фигура.get()
+
+
 def draw_board(whitecolor = None, blackcolor = None):
+    global цвет_белой_клетки, цвет_черной_клетки
+
+    #запомним расцветку клеток. пригодится при очистке доски
+    цвет_белой_клетки = whitecolor
+    цвет_черной_клетки = blackcolor
+
     сторона_квадрата = размер_доски // 8
 
     номер_квадратика = 0
@@ -150,13 +185,17 @@ def draw_arrow(ix_from, iy_from, ix_to, iy_to, color = "black", width = 1):
 
 def clear_board():
     try:
-        холст.delete('line')
-        холст.delete('dot')
+        for элемент in холст.find_all():
+            холст.delete(элемент)
+
+        draw_board(whitecolor = цвет_белой_клетки, blackcolor = цвет_черной_клетки)
     except:
         pass
 
+
 if __name__ == '__main__':
-    init_gui(True)
+    init_gui(info_panel = True)
+
     draw_board()
 
     окно.mainloop()
