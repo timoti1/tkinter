@@ -174,13 +174,42 @@ def draw_arrow(ix_from, iy_from, ix_to, iy_to, color = "black", width = 1):
         to_x = rect_to[0] + сторона_квадрата // 2
         to_y = rect_to[1] + сторона_квадрата // 2
 
-        # print(from_x, from_y, to_x, to_y)
-        холст.create_line(from_x, from_y, to_x, to_y, fill = color, arrow = tkinter.LAST, width = width, tags = 'line')
+        tag = 'line{}{}{}{}'.format(iy_from, ix_from, iy_to, ix_to)
+        холст.create_line(from_x, from_y, to_x, to_y, fill = color, arrow = tkinter.LAST, width = width, tags = tag)
 
         холст.update_idletasks()
         холст.update()
     except:
         pass
+
+
+def draw_text(ix, iy, text, color = None):
+    tag = 'rect{}{}'.format(iy, ix)
+
+    сторона_квадрата = размер_доски // 8
+
+    try:
+        rect = холст.coords(tag)
+
+        x = rect[0] + сторона_квадрата // 2
+        y = rect[1] + сторона_квадрата // 2
+
+        холст.create_text(x, y, fill = color, text = text, tags = 'text{}{}'.format(iy, ix))
+
+        холст.update_idletasks()
+        холст.update()
+    except:
+        pass
+
+
+def remove_text(ix, iy):
+    tag = 'text{}{}'.format(iy, ix)
+    холст.delete(tag)
+
+
+def remove_arrow(ix_from, iy_from, ix_to, iy_to):
+    tag = 'line{}{}{}{}'.format(iy_from, ix_from, iy_to, ix_to)
+    холст.delete(tag)
 
 
 def clear_board():
