@@ -18,10 +18,14 @@ import tkinter
 
 выбранная_фигура = None
 
+отладка = None
+анимация = None
+
 
 def init_gui(info_panel = False):
     global окно, холст, поле_величина_задержки, кнопка_расчитать,\
-           ширина_информационной_панели, выбранная_фигура
+           ширина_информационной_панели, выбранная_фигура, \
+           отладка, анимация
 
     if not info_panel:
         ширина_информационной_панели = 0
@@ -47,17 +51,27 @@ def init_gui(info_panel = False):
         контейнер2 = tkinter.Frame(master = окно, background = цвет_фона_информационной_панели)
         контейнер2.place(x = w + 20, y = 0, width = ширина_информационной_панели - 20, height = h + 20)
 
+        отладка = tkinter.BooleanVar()
+        отладка.set(1)
+        флажок_отладка = tkinter.Checkbutton(master = контейнер2, text = 'Отладка', variable = отладка, background = цвет_фона_информационной_панели)
+        флажок_отладка.place(x = 20, y = 0)
+
+        анимация = tkinter.BooleanVar()
+        анимация.set(1)
+        флажок_анимация = tkinter.Checkbutton(master = контейнер2, text = 'Анимация', variable = анимация, background = цвет_фона_информационной_панели)
+        флажок_анимация.place(x = 20, y = 30)
+
         метка_величина_задержки = tkinter.Label(master = контейнер2, text = 'Задержка, с:', background = цвет_фона_информационной_панели)
-        метка_величина_задержки.place(x = 20, y = 0)
+        метка_величина_задержки.place(x = 20, y = 50)
 
         поле_величина_задержки = tkinter.Spinbox(master = контейнер2, from_ = 0, to = 1, increment = 0.1)
-        поле_величина_задержки.place(x = 20, y = 20, width = 100)
+        поле_величина_задержки.place(x = 20, y = 70, width = 100)
 
-        кнопка_расчитать = tkinter.Button(master = контейнер2, text = 'Рассчитать')
-        кнопка_расчитать.place(x = 20, y = 45, width = 100)
+        кнопка_расчитать = tkinter.Button(master = контейнер2, text = 'Рассчитать', foreground = 'red')
+        кнопка_расчитать.place(x = 20, y = 110, width = 100)
 
         метка_выбранная_фигура = tkinter.Label(master = контейнер2, text = 'Фигура:', background = цвет_фона_информационной_панели)
-        метка_выбранная_фигура.place(x = 20, y = 80)
+        метка_выбранная_фигура.place(x = 20, y = 150)
 
         ФИГУРЫ = [
                 'конь',
@@ -71,7 +85,7 @@ def init_gui(info_panel = False):
 
         for i, фигура in enumerate(ФИГУРЫ):
             b = tkinter.Radiobutton(master = контейнер2, text = фигура, variable = выбранная_фигура, value = фигура, indicatoron = 0)
-            b.place(x = 20, y = 100 + i*20, width = 100)
+            b.place(x = 20, y = 170 + i*20, width = 100)
 
 
 def get_delay():
@@ -81,6 +95,14 @@ def get_delay():
         задержка = 0
 
     return float(задержка)
+
+
+def get_debug():
+    return отладка.get()
+
+
+def get_animate():
+    return анимация.get()
 
 
 def get_selected_figure():
@@ -153,8 +175,8 @@ def highlight_cell(ix, iy, color, kind = 'dot'):
     try:
         холст.itemconfig(tag, fill = color)
 
-        холст.update_idletasks()
-        холст.update()
+        окно.update_idletasks()
+        окно.update()
     except:
         pass
 
@@ -177,8 +199,8 @@ def draw_arrow(ix_from, iy_from, ix_to, iy_to, color = "black", width = 1):
         tag = 'line{}{}{}{}'.format(iy_from, ix_from, iy_to, ix_to)
         холст.create_line(from_x, from_y, to_x, to_y, fill = color, arrow = tkinter.LAST, width = width, tags = tag)
 
-        холст.update_idletasks()
-        холст.update()
+        окно.update_idletasks()
+        окно.update()
     except:
         pass
 
@@ -196,8 +218,8 @@ def draw_text(ix, iy, text, color = None):
 
         холст.create_text(x, y, fill = color, text = text, tags = 'text{}{}'.format(iy, ix))
 
-        холст.update_idletasks()
-        холст.update()
+        окно.update_idletasks()
+        окно.update()
     except:
         pass
 
