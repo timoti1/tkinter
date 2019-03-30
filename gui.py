@@ -21,6 +21,8 @@ import tkinter
 отладка = None
 анимация = None
 
+начальная_клетка = None
+
 
 def init_gui(info_panel = False):
     global окно, холст, поле_величина_задержки, кнопка_расчитать,\
@@ -224,6 +226,48 @@ def draw_text(ix, iy, text, color = None):
         pass
 
 
+def move_start_cell(event):
+    холст.coords('start_cell', event.x - 10, event.y - 10, event.x + 10, event.y + 10)
+
+
+def release_start_cell(event):
+    global начальная_клетка
+
+    tag_rect = холст.find_closest(*холст.coords('start_cell')[:2], halo = размер_доски // 16, start = 'start_cell')[0]
+    rect = холст.coords(tag_rect)
+
+    сторона_квадрата = размер_доски // 8
+    rect_center_x = rect[0] + сторона_квадрата // 2
+    rect_center_y = rect[1] + сторона_квадрата // 2
+
+    холст.coords('start_cell', rect_center_x - 10, rect_center_y - 10, rect_center_x + 10, rect_center_y + 10)
+    начальная_клетка = (int(rect[0] // сторона_квадрата) + 1, int(rect[1] // сторона_квадрата) + 1)
+
+
+def draw_start_point(ix = 1, iy = 1):
+    global начальная_клетка
+
+    начальная_клетка = (ix, iy)
+
+    rect_tag = 'rect{}{}'.format(iy, ix)
+
+    try:
+        rect = холст.coords(rect_tag)
+
+        сторона_квадрата = размер_доски // 8
+
+        rect_center_x = rect[0] + сторона_квадрата // 2
+        rect_center_y = rect[1] + сторона_квадрата // 2
+
+    except:
+        pass
+
+    холст.create_oval(rect_center_x - 10, rect_center_y - 10, rect_center_x + 10, rect_center_y + 10, fill = 'yellow', tags='start_cell')
+
+    холст.tag_bind('start_cell', '<Button1-Motion>', move_start_cell)
+    холст.tag_bind('start_cell', '<ButtonRelease-1>', release_start_cell)
+
+
 def remove_text(ix, iy):
     tag = 'text{}{}'.format(iy, ix)
     холст.delete(tag)
@@ -248,6 +292,7 @@ if __name__ == '__main__':
     init_gui(info_panel = True)
 
     draw_board()
+    draw_start_point(1, 1)
 
     окно.mainloop()
 
